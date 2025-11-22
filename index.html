@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سیستم واقعی پاداش ساتوشی</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: white;
+        }
+
+        .container {
+            background: rgba(26, 26, 46, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            border: 2px solid #FFD700;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            color: #FFD700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .balance-amount {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .reward-section {
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 25px 0;
+            border: 2px solid #FFD700;
+            position: relative;
+        }
+
+        .reward-amount {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #FFD700;
+            margin: 15px 0;
+        }
+
+        .reward-button {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            border: none;
+            border-radius: 50px;
+            padding: 20px 40px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 15px 0;
+            width: 100%;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .reward-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.6);
+        }
+
+        .reward-button:active {
+            transform: translateY(-1px);
+        }
+
+        .reward-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .wallet-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .wallet-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #333;
+            border-radius: 10px;
+            background: #2a2a3a;
+            color: white;
+            font-size: 16px;
+            margin: 10px 0;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+
+        .wallet-input:focus {
+            border-color: #FFD700;
+            outline: none;
+        }
+
+        .send-button {
+            background: linear-gradient(45deg, #00b894, #00a085);
+            border: none;
+            border-radius: 50px;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 0;
+            width: 100%;
+        }
+
+        .send-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .send-button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+
+        .message {
+            margin: 15px 0;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .success {
+            background: rgba(0, 184, 148, 0.2);
+            color: #00b894;
+            border: 1px solid #00b894;
+        }
+
+        .error {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            border: 1px solid #e74c3c;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top-color: #FFD700;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .transaction-log {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            max-height: 200px;
+            overflow-y: auto;
+            text-align: right;
+            font-size: 0.8rem;
+        }
+
+        .info-box {
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 0.9rem;
+            color: #FFD700;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 سیستم واقعی پاداش ساتوشی</h1>
+            <p>اتصال مستقیم به شبکه Bitcoin Lightning</p>
+        </div>
+
+        <div class="balance-card">
+            <div>موجودی واقعی کیف پول ZBD</div>
+            <div class="balance-amount" id="balanceAmount">0</div>
+            <div>ساتوشی</div>
+            <button onclick="loadRealBalance()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 15px; border-radius: 5px; margin-top: 10px; cursor: pointer;">
+                🔄 بروزرسانی موجودی
+            </button>
+        </div>
+
+        <div class="reward-section">
+            <h3>🎯 دریافت پاداش ۱۰ میلیون ساتوشی</h3>
+            <div class="reward-amount">۱۰,۰۰۰,۰۰۰ ساتوشی</div>
+            <button class="reward-button pulse" id="rewardButton" onclick="sendTenMillionSatoshi()">
+                🎁 دریافت پاداش واقعی
+            </button>
+            <div id="rewardMessage" class="message"></div>
+        </div>
+
+        <div class="wallet-section">
+            <h3>📤 ارسال به کیف پول دیگر</h3>
+            <input type="text" class="wallet-input" id="walletAddress" 
+                   placeholder="Lightning Address (مثال: yourname@zbd.gg)">
+            <input type="text" class="wallet-input" id="customAmount" 
+                   placeholder="مقدار ساتوشی (اختیاری)">
+            <button class="send-button" id="sendButton" onclick="sendCustomSatoshi()">
+                ارسال ساتوشی واقعی
+            </button>
+            <div id="sendMessage" class="message"></div>
+        </div>
+
+        <div class="info-box">
+            💡 این سیستم کاملاً واقعی است و به شبکه اصلی Bitcoin متصل می‌باشد
+        </div>
+
+        <div class="transaction-log">
+            <h4>📋 آخرین تراکنش‌ها</h4>
+            <div id="transactionHistory">تراکنشی وجود ندارد</div>
+        </div>
+    </div>
+
+    <script>
+        // تنظیمات API واقعی
+        const ZBD_API_KEY = "1PnXYRdcm13gJrHZVzctgCAUIEniVomQR";
+        const ZBD_BASE_URL = "https://api.zbdpay.com";
+        const REWARD_AMOUNT = "10000000"; // 10 میلیون ساتوشی
+
+        // تاریخچه تراکنش‌ها
+        let transactions = JSON.parse(localStorage.getItem('real_transactions')) || [];
+
+        // بارگذاری موجودی واقعی
+        async function loadRealBalance() {
+            const balanceElement = document.getElementById('balanceAmount');
+            balanceElement.innerHTML = '<span class="loading"></span>';
+            
+            try {
+                const response = await fetch(`${ZBD_BASE_URL}/v0/wallet`, {
+                    headers: {
+                        "X-API-Key": ZBD_API_KEY
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    balanceElement.textContent = data.balance.toLocaleString();
+                    showMessage(`✅ موجودی بروز شد: ${data.balance.toLocaleString()} ساتوشی`, 'success');
+                } else {
+                    throw new Error('خطا در دریافت موجودی');
+                }
+            } catch (error) {
+                console.error('Error loading balance:', error);
+                balanceElement.textContent = 'خطا';
+                showMessage('❌ خطا در دریافت موجودی', 'error');
+            }
+        }
+
+        // ارسال ۱۰ میلیون ساتوشی واقعی
+        async function sendTenMillionSatoshi() {
+            const button = document.getElementById('rewardButton');
+            const message = document.getElementById('rewardMessage');
+            const walletAddress = prompt("لطفاً Lightning Address خود را وارد کنید:");
+            
+            if (!walletAddress) {
+                showMessage('❌ آدرس کیف پول الزامی است', 'error', 'rewardMessage');
+                return;
+            }
+
+            if (!walletAddress.includes('@') && !walletAddress.startsWith('ln')) {
+                showMessage('❌ آدرس Lightning معتبر نیست', 'error', 'rewardMessage');
+                return;
+            }
+
+            button.disabled = true;
+            button.innerHTML = '<span class="loading"></span> در حال ارسال ۱۰ میلیون ساتوشی...';
+            message.textContent = '';
+            message.className = 'message';
+
+            try {
+                // ارسال واقعی از طریق ZBD API
+                const response = await fetch(`${ZBD_BASE_URL}/v0/send-payment`, {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-API-Key": ZBD_API_KEY
+                    },
+                    body: JSON.stringify({
+                        amount: REWARD_AMOUNT,
+                        to: walletAddress,
+                        description: "10 Million Satoshi Reward - Real Transfer"
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // ثبت تراکنش موفق
+                    const transaction = {
+                        id: data.id,
+                        type: 'reward',
+                        amount: parseInt(REWARD_AMOUNT),
+                        to: walletAddress,
+                        timestamp: new Date().toLocaleString('fa-IR'),
+                        status: 'success',
+                        description: 'پاداش ۱۰ میلیون ساتوشی'
+                    };
+                    
+                    transactions.unshift(transaction);
+                    localStorage.setItem('real_transactions', JSON.stringify(transactions));
+                    updateTransactionHistory();
+                    
+                    showMessage(`✅ ۱۰,۰۰۰,۰۰۰ ساتوشی واقعی با موفقیت ارسال شد! 🎉`, 'success', 'rewardMessage');
+                    
+                    // بروزرسانی موجودی
+                    setTimeout(loadRealBalance, 2000);
+                    
+                } else {
+                    throw new Error(data.message || `خطا: ${response.status}`);
+                }
+
+            } catch (error) {
+                console.error('Error sending reward:', error);
+                
+                // ثبت تراکنش ناموفق
+                const transaction = {
+                    id: 'err_' + Date.now(),
+                    type: 'reward',
+                    amount: parseInt(REWARD_AMOUNT),
+                    to: walletAddress,
+                    timestamp: new Date().toLocaleString('fa-IR'),
+                    status: 'failed',
+                    error: error.message
+                };
+                
+                transactions.unshift(transaction);
+                localStorage.setItem('real_transactions', JSON.stringify(transactions));
+                updateTransactionHistory();
+                
+                showMessage(`❌ خطا در ارسال: ${error.message}`, 'error', 'rewardMessage');
+            } finally {
+                button.disabled = false;
+                button.textContent = '🎁 دریافت پاداش واقعی';
+            }
+        }
+
+        // ارسال ساتوشی دلخواه
+        async function sendCustomSatoshi() {
+            const button = document.getElementById('sendButton');
+            const message = document.getElementById('sendMessage');
+            const walletAddress = document.getElementById('walletAddress').value.trim();
+            const customAmount = document.getElementById('customAmount').value.trim() || "1000";
+
+            if (!walletAddress) {
+                showMessage('❌ لطفاً آدرس کیف پول را وارد کنید', 'error', 'sendMessage');
+                return;
+            }
+
+            if (!walletAddress.includes('@') && !walletAddress.startsWith('ln')) {
+                showMessage('❌ آدرس Lightning معتبر نیست', 'error', 'sendMessage');
+                return;
+            }
+
+            button.disabled = true;
+            button.innerHTML = '<span class="loading"></span> در حال ارسال...';
+            message.textContent = '';
+            message.className = 'message';
+
+            try {
+                const response = await fetch(`${ZBD_BASE_URL}/v0/send-payment`, {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-API-Key": ZBD_API_KEY
+                    },
+                    body: JSON.stringify({
+                        amount: customAmount,
+                        to: walletAddress,
+                        description: "Custom Satoshi Transfer"
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    const transaction = {
+                        id: data.id,
+                        type: 'custom',
+                        amount: parseInt(customAmount),
+                        to: walletAddress,
+                        timestamp: new Date().toLocaleString('fa-IR'),
+                        status: 'success'
+                    };
+                    
+                    transactions.unshift(transaction);
+                    localStorage.setItem('real_transactions', JSON.stringify(transactions));
+                    updateTransactionHistory();
+                    
+                    showMessage(`✅ ${parseInt(customAmount).toLocaleString()} ساتوشی ارسال شد!`, 'success', 'sendMessage');
+                    setTimeout(loadRealBalance, 2000);
+                    
+                } else {
+                    throw new Error(data.message || 'خطا در ارسال');
+                }
+
+            } catch (error) {
+                showMessage(`❌ خطا: ${error.message}`, 'error', 'sendMessage');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'ارسال ساتوشی واقعی';
+            }
+        }
+
+        // نمایش پیام
+        function showMessage(text, type, elementId = 'rewardMessage') {
+            const message = document.getElementById(elementId);
+            message.textContent = text;
+            message.className = `message ${type}`;
+        }
+
+        // آپدیت تاریخچه تراکنش‌ها
+        function updateTransactionHistory() {
+            const historyDiv = document.getElementById('transactionHistory');
+            
+            if (transactions.length === 0) {
+                historyDiv.innerHTML = 'تراکنشی وجود ندارد';
+                return;
+            }
+            
+            historyDiv.innerHTML = '';
+            
+            transactions.slice(0, 5).forEach(tx => {
+                const txDiv = document.createElement('div');
+                txDiv.style.padding = '8px';
+                txDiv.style.borderBottom = '1px solid #333';
+                txDiv.style.color = tx.status === 'success' ? '#00b894' : '#e74c3c';
+                txDiv.style.fontSize = '0.75rem';
+                
+                let txText = `${tx.timestamp} - `;
+                txText += `${tx.amount.toLocaleString()} ساتوشی `;
+                
+                if (tx.to) {
+                    const shortAddress = tx.to.length > 20 ? tx.to.substring(0, 20) + '...' : tx.to;
+                    txText += `به ${shortAddress}`;
+                }
+                
+                txText += ` - ${tx.status === 'success' ? '✅' : '❌'}`;
+                
+                txDiv.textContent = txText;
+                historyDiv.appendChild(txDiv);
+            });
+        }
+
+        // بارگذاری اولیه
+        window.onload = function() {
+            loadRealBalance();
+            updateTransactionHistory();
+            
+            // نمایش اطلاعات شبکه
+            showMessage('🔗 متصل به شبکه اصلی Bitcoin Lightning', 'success', 'rewardMessage');
+        };
+    </script>
+</body>
+</html>
